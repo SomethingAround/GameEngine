@@ -1,16 +1,21 @@
 #pragma once
 #include "glm.hpp"
+#include "ext.hpp"
 
 
 class Camera
 {
 public:
 
+	Camera();
+
 	virtual void Update(float fDeltaTime) = 0;
 
-	void SetPerspective(float fDieldOfView, float fAspectRatio, float fNear, float fFar);
+	void SetPerspective(float fFieldOfView, float fAspectRatio, float fNear, float fFar);
 
-	void SetLookAt(glm::vec3 from, glm::vec3 up);
+	void SetLookAt(glm::vec3 from, glm::vec3 to, glm::vec3 up);
+
+	void SetPosition(glm::vec3 position);
 
 	glm::mat4 GetWorldTransform();
 	
@@ -21,8 +26,9 @@ public:
 	glm::mat4 GetProjectionView();
 	
 
+	void UpdateProjectionViewTransform();
 
-private:
+protected:
 
 	glm::mat4 worldTransform;
 
@@ -32,6 +38,5 @@ private:
 
 	glm::mat4 projectionViewTransform;
 
-	void UpdateProjectionViewTransform();
 };
 

@@ -2,6 +2,7 @@
 #include "ext.hpp"
 #include "gl_core_4_5.h"
 #include "glfw3.h"
+#include "FlyCamera.h"
 
 #include <iostream>
 #include <fstream>
@@ -14,6 +15,9 @@ int main()
 	{
 		return -1;
 	}
+
+	int iWindowWidth = 1280;
+	int iWindowHeight = 720;
 
 	GLFWwindow* window = glfwCreateWindow(1280, 720, "Computer Graphics", nullptr, nullptr);
 
@@ -62,19 +66,19 @@ int main()
 		//Front Verts
 		glm::vec3(-0.25f, 0.25f, 0.25),
 		glm::vec3(-0.25f,-0.25f, 0.25),
-		glm::vec3 (0.25f, 0.25f, 0.25),
-		glm::vec3 (0.25f,-0.25f, 0.25),
+		glm::vec3(0.25f, 0.25f, 0.25),
+		glm::vec3(0.25f,-0.25f, 0.25),
 		//Back Verts
 		glm::vec3(-0.25f, 0.25f,-0.25),
 		glm::vec3(-0.25f,-0.25f,-0.25),
-		glm::vec3( 0.25f, 0.25f,-0.25),
-		glm::vec3( 0.25f,-0.25f,-0.25)
+		glm::vec3(0.25f, 0.25f,-0.25),
+		glm::vec3(0.25f,-0.25f,-0.25)
 	};
 
 	const int index_buffer_size = 36;
 
 	int index_buffer[index_buffer_size]
-	{ 
+	{
 		//Front
 		0,1,2,
 		2,1,3,
@@ -92,7 +96,7 @@ int main()
 		3,5,7,
 		//Top
 		4,0,6,
-		6,0,2};
+		6,0,2 };
 
 	//Create and load mesh
 	unsigned int VAO;
@@ -118,8 +122,9 @@ int main()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 	//Camera
-	glm::mat4 projection = glm::perspective(1.507f, 16.0f / 9.0f, 0.1f, 50.0f);
-	glm::mat4 view = glm::lookAt(glm::vec3(0, 0, 1), glm::vec3(0), glm::vec3(0, 1, 0));
+	FlyCamera* Camera = new FlyCamera(glm::vec3(0, 0, 1), glm::vec3(0), 1.507f, 16.0f / 9.0f, 0.1f, 50.0f);
+	//glm::mat4 projection = glm::perspective(1.507f, 16.0f / 9.0f, 0.1f, 50.0f);
+	//glm::mat4 view = glm::lookAt(glm::vec3(0, 0, 1), glm::vec3(0), glm::vec3(0, 1, 0));
 	glm::mat4 model = glm::mat4(1.0f);
 
 	unsigned int vertex_shader_ID = 0;
@@ -261,9 +266,15 @@ int main()
 	float fLineWidth = 1.0f;
 	bool bHit = false;
 
-	glPolygonMode(GL_BACK, GL_LINE);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	glLineWidth(fLineWidth);
 
+	float fCurrentFrame = glfwGetTime();
+	float fDeltaTime = 0.0f;
+	float fLastFrame = 0.0f;
+
+	glfwSetCursorPos(window, iWindowWidth * 0.5, iWindowHeight * 0.5);
+	ShowCursor(true);
 	//Game Loop
 	while (glfwWindowShouldClose(window) == false && glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS)
 	{
@@ -273,16 +284,22 @@ int main()
 
 		glLineWidth(fLineWidth);
 
-		model = glm::rotate(model, 0.016f, glm::vec3(0.5f));
+		fCurrentFrame = glfwGetTime();
+		fDeltaTime = fCurrentFrame - fLastFrame;
+		fLastFrame = fCurrentFrame;
 
-		glm::mat4 pv = projection * view;
+		Camera->Update(fDeltaTime);
+
+		//model = glm::rotate(model, 0.016f, glm::vec3(0.5f));
+
+		//glm::mat4 pv = projection * view;
 
 		glm::vec4 color = glm::vec4(0.5f);
-
+	
 		glUseProgram(shader_program_ID);
 
 		auto uniform_location = glGetUniformLocation(shader_program_ID, "projection_view_matrix");
-		glUniformMatrix4fv(uniform_location, 1, false, glm::value_ptr(pv));
+		glUniformMatrix4fv(uniform_location, 1, false, glm::value_ptr(Camera->GetProjectionView()));
 
 		uniform_location = glGetUniformLocation(shader_program_ID, "model_matrix");
 		glUniformMatrix4fv(uniform_location, 1, false, glm::value_ptr(model));
@@ -293,7 +310,6 @@ int main()
 		glBindVertexArray(VAO);
 		//glDrawArrays(GL_TRIANGLES, 0, number_of_verts);
 		glDrawElements(GL_TRIANGLES, index_buffer_size, GL_UNSIGNED_INT, 0);
-
 
 
 		if (fLineWidth >= 10.0f && !bHit)
