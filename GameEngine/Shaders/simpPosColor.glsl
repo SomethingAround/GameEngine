@@ -1,6 +1,7 @@
 #version 450
 
 uniform vec4 color = vec4(1,1,1,1);
+uniform float fragTime; 
 
 in vec3 pos;
 

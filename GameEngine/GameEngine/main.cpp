@@ -1,8 +1,11 @@
+
+
 #include "glm.hpp"
 #include "ext.hpp"
 #include "gl_core_4_5.h"
 #include "glfw3.h"
 #include "FlyCamera.h"
+
 #include "Mesh.h"
 #include "OBJMesh.h"
 
@@ -60,7 +63,7 @@ int main()
 	unsigned int uiShaderProgramID = 0;
 
 	std::string sShaderData;
-	std::ifstream inFileStream("..\\Shaders\\simpAcosVert.glsl", std::ifstream::in);
+	std::ifstream inFileStream("..\\Shaders\\TextVert.glsl", std::ifstream::in);
 
 	std::stringstream stringStream;
 	//Load the source into a string for compilation
@@ -110,7 +113,7 @@ int main()
 
 
 
-	std::ifstream frag_in_file_stream("..\\Shaders\\simpPosColor.glsl", std::ifstream::in);
+	std::ifstream frag_in_file_stream("..\\Shaders\\TextFrag.glsl", std::ifstream::in);
 
 	std::stringstream fragment_string_stream;
 	//Load the source into a string for compilation
@@ -194,8 +197,8 @@ int main()
 	float fLineWidth = 1.0f;
 	bool bHit = false;
 
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	glLineWidth(fLineWidth);
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	//glLineWidth(fLineWidth);
 	
 	//glClearColor(0.50f, 0.50f, 0.50f, 1);
 
@@ -204,12 +207,13 @@ int main()
 	float fLastFrame = 0.0f;
 
 	glfwSetCursorPos(pWindow, iWindowWidth * 0.5, iWindowHeight * 0.5);
-	ShowCursor(true);
+	ShowCursor(false);
+
 	//Game Loop
 	while (glfwWindowShouldClose(pWindow) == false && glfwGetKey(pWindow, GLFW_KEY_ESCAPE) != GLFW_PRESS)
 	{
-		//glClearColor(0.25f, 0.25f, 0.25f, 1);
-		//glEnable(GL_DEPTH_TEST);
+		glClearColor(1.0f, 1.0f, 1.0f, 1);
+		glEnable(GL_DEPTH_TEST);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glPointSize(fLineWidth);
@@ -237,11 +241,14 @@ int main()
 		uniform_location = glGetUniformLocation(uiShaderProgramID, "color");
 		glUniform4fv(uniform_location, 1, glm::value_ptr(color));
 
-		uniform_location = glGetUniformLocation(uiShaderProgramID, "time");
-		glUniform1f(uniform_location, glfwGetTime());
-		//pMesh->Draw();
+		//uniform_location = glGetUniformLocation(uiShaderProgramID, "fragTime");
+		//glUniform1f(uniform_location, glfwGetTime());
 
-		myMesh->draw();
+		//uniform_location = glGetUniformLocation(uiShaderProgramID, "time");
+		//glUniform1f(uniform_location, glfwGetTime());
+		pMesh->Draw();
+
+		//myMesh->draw();
 		//glBindVertexArray(VAO);
 		////glDrawArrays(GL_TRIANGLES, 0, number_of_verts);
 		//glDrawElements(GL_TRIANGLES, index_buffer_size, GL_UNSIGNED_INT, 0);

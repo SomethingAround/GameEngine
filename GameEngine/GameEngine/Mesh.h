@@ -1,6 +1,5 @@
 #pragma once
 #include "glm.hpp"
-#include "gl_core_4_5.h"
 
 #include <vector>
 #include <assert.h>
@@ -14,6 +13,7 @@ public:
 	struct Vertex
 	{
 		glm::vec3 v3Position;
+		glm::vec2 v2UV;
 	};
 
 	std::vector<glm::vec3> m_av3Vericies;
@@ -27,4 +27,10 @@ private:
 
 	unsigned int m_uiTriCount;
 	unsigned int m_uiVAO, m_uiVBO, m_uiIBO;
+
+	unsigned int m_uiTexture;
+	
+	
+	
+
 };

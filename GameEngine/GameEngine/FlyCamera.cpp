@@ -10,7 +10,7 @@ FlyCamera::FlyCamera(
 	const float FarDistance) : Camera::Camera()
 {
 	up = glm::vec3(0, 1, 0);
-	m_fSpeed = 1.0f;
+	m_fSpeed = 5.0f;
 	m_fMouseSpeed = 0.1f;
 	SetPerspective(FOVY, fAspectRatio, nearDistance, FarDistance);
 	SetLookAt(position, LookAtPoint, up);
