@@ -13,6 +13,7 @@ Mesh::Mesh()
 	m_uiIBO = 0;
 
 	//data 
+	data = stbi_load("..\\Images\\direction_test.jpg", &x, &y, &n, 0);
 
 	glGenVertexArrays(1, &m_uiVAO);
 	glGenBuffers(1, &m_uiVBO);
@@ -26,7 +27,7 @@ Mesh::~Mesh()
 	glDeleteBuffers(1, &m_uiVAO);
 	glDeleteBuffers(1, &m_uiVBO);
 	glDeleteBuffers(1, &m_uiIBO);
-	glDeleteTextures(GL_TEXTURE_2D, &m_uiTexture);
+	glDeleteTextures(1, &m_uiTexture);
 }
 
 void Mesh::InitialiseQuad()
@@ -45,19 +46,25 @@ void Mesh::InitialiseQuad()
 	//	glm::vec3(0.25f,-0.25f,-0.25)
 	//};
 
-	Vertex vertices[4];
-	//Front Verts
-	vertices[0].v3Position = glm::vec3(-0.25f, 0.25f, 0.25);
-	vertices[0].v2UV = glm::vec2(0, 0);
+	Vertex vertices[4] =
+	{
+		Vertex{{-0.25f,	 0.25f, 0.25},	{0, 0}},
+		Vertex{{-0.25f,	-0.25f, 0.25},	{0, 1}},
+		Vertex{{ 0.25f,	 0.25f, 0.25},	{1, 0}},
+		Vertex{{ 0.25f,	-0.25f, 0.25},	{1, 1}}
+	};
+	////Front Verts
+	//vertices[0].v3Position = glm::vec3(-0.25f, 0.25f, 0.25);
+	//vertices[0].v2UV = glm::vec2(0, 0);
 
-	vertices[1].v3Position = glm::vec3(-0.25f, -0.25f, 0.25);
-	vertices[1].v2UV = glm::vec2(0, 1);
+	//vertices[1].v3Position = glm::vec3(-0.25f, -0.25f, 0.25);
+	//vertices[1].v2UV = glm::vec2(0, 1);
 
-	vertices[2].v3Position = glm::vec3(0.25f, 0.25f, 0.25);
-	vertices[2].v2UV = glm::vec2(1, 0);
+	//vertices[2].v3Position = glm::vec3(0.25f, 0.25f, 0.25);
+	//vertices[2].v2UV = glm::vec2(1, 0);
 
-	vertices[3].v3Position = glm::vec3(0.25f, -0.25f, 0.25);
-	vertices[3].v2UV = glm::vec2(1, 1);
+	//vertices[3].v3Position = glm::vec3(0.25f, -0.25f, 0.25);
+	//vertices[3].v2UV = glm::vec2(1, 1);
 
 
 	////Back Verts
@@ -94,7 +101,7 @@ void Mesh::InitialiseQuad()
 	 glBindVertexArray(m_uiVAO);
 
 	 glBindBuffer(GL_ARRAY_BUFFER, m_uiVBO);
-	 glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(Vertex), vertices, GL_STATIC_DRAW);
+	 glBufferData(GL_ARRAY_BUFFER, 4 * sizeof(Vertex), vertices, GL_STATIC_DRAW);
 
 	 glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_uiIBO);
 	 glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_auiIndex.size() * sizeof(int), m_auiIndex.data(), GL_STATIC_DRAW);
@@ -102,21 +109,18 @@ void Mesh::InitialiseQuad()
 	 glEnableVertexAttribArray(0);
 	 glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
 
+	 glEnableVertexAttribArray(1);
+	 glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(glm::vec3)));
+
 	 glBindVertexArray(0);
 	 glBindBuffer(GL_ARRAY_BUFFER, 0);
 	 glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-	 int x, y, n;
-
-	 unsigned char* data = stbi_load("..\\Images\\direction_test.jpg", &x, &y, &n, 0);
-
-
 	 glGenTextures(1, &m_uiTexture);
 	 glBindTexture(GL_TEXTURE_2D, m_uiTexture);
 	 glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, x, y, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-	 
-	 glEnableVertexAttribArray(1);
-	 glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex),(void*)(sizeof(glm::vec2)));
+
+
 
 	 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);

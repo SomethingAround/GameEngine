@@ -12,11 +12,12 @@ public:
 
 	struct Vertex
 	{
-		glm::vec3 v3Position;
+		glm::vec4 v4Position;
+		glm::vec4 v4Normal;
 		glm::vec2 v2UV;
 	};
 
-	std::vector<glm::vec3> m_av3Vericies;
+	//std::vector<glm::vec3> m_av3Vericies;
 	std::vector<unsigned int> m_auiIndex;
 
 	void InitialiseQuad();
@@ -30,7 +31,7 @@ private:
 
 	unsigned int m_uiTexture;
 	
+	int x, y, n;
 	
-	
-
+	unsigned char* data;
 };
