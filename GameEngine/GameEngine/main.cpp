@@ -215,7 +215,7 @@ int main()
 	};
 
 	Light m_Light[2];
-
+	m_Light[1].v3Direction = glm::normalize(glm::vec3(glm::cos(0.0f), glm::sin(-1.0f), 0));
 	//Game Loop
 	while (glfwWindowShouldClose(pWindow) == false && glfwGetKey(pWindow, GLFW_KEY_ESCAPE) != GLFW_PRESS)
 	{
@@ -231,7 +231,7 @@ int main()
 
 		pCamera->Update(fDeltaTime);
 
-		m_Light.v3Direction = glm::normalize(glm::vec3(glm::cos(fCurrentFrame), glm::sin(fCurrentFrame), 0));
+		m_Light[0].v3Direction = glm::normalize(glm::vec3(glm::cos(fCurrentFrame), glm::sin(fCurrentFrame), 0));
 
 		//model = glm::rotate(model, 0.016f, glm::vec3(0.5f));
 
