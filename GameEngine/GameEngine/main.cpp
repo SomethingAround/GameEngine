@@ -54,16 +54,16 @@ int main()
 	FlyCamera* pCamera = new FlyCamera(glm::vec3(0, 0, 1), glm::vec3(0), 1.507f, 16.0f / 9.0f, 0.1f, 50.0f);
 	glm::mat4 m4Model = glm::mat4(1.0f);
 	Mesh* pMesh = new Mesh;
-	OBJMesh* myMesh = new OBJMesh;
+	OBJMesh* objMesh = new OBJMesh;
 
-	myMesh->load("..\\Models\\Bunny.obj", false);
+	objMesh->load("..\\Models\\Bunny.obj", false);
 
 	unsigned int uiVertexShaderID = 0;
 	unsigned int uiFragementShaderID = 0;
 	unsigned int uiShaderProgramID = 0;
 
 	std::string sShaderData;
-	std::ifstream inFileStream("..\\Shaders\\TextVert.glsl", std::ifstream::in);
+	std::ifstream inFileStream("..\\Shaders\\PhongLightVert.glsl", std::ifstream::in);
 
 	std::stringstream stringStream;
 	//Load the source into a string for compilation
@@ -113,7 +113,7 @@ int main()
 
 
 
-	std::ifstream frag_in_file_stream("..\\Shaders\\TextFrag.glsl", std::ifstream::in);
+	std::ifstream frag_in_file_stream("..\\Shaders\\PhongLightFrag.glsl", std::ifstream::in);
 
 	std::stringstream fragment_string_stream;
 	//Load the source into a string for compilation
@@ -209,10 +209,17 @@ int main()
 	glfwSetCursorPos(pWindow, iWindowWidth * 0.5, iWindowHeight * 0.5);
 	ShowCursor(false);
 
+	struct Light
+	{
+		glm::vec3 v3Direction;
+	};
+
+	Light m_Light[2];
+
 	//Game Loop
 	while (glfwWindowShouldClose(pWindow) == false && glfwGetKey(pWindow, GLFW_KEY_ESCAPE) != GLFW_PRESS)
 	{
-		//glClearColor(1.0f, 1.0f, 1.0f, 1);
+		glClearColor(0.5f, 0.5f, 0.5f, 1);
 		glEnable(GL_DEPTH_TEST);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -224,6 +231,8 @@ int main()
 
 		pCamera->Update(fDeltaTime);
 
+		m_Light.v3Direction = glm::normalize(glm::vec3(glm::cos(fCurrentFrame), glm::sin(fCurrentFrame), 0));
+
 		//model = glm::rotate(model, 0.016f, glm::vec3(0.5f));
 
 		//glm::mat4 pv = projection * view;
@@ -232,23 +241,29 @@ int main()
 	
 		glUseProgram(uiShaderProgramID);
 
-		auto uniform_location = glGetUniformLocation(uiShaderProgramID, "projection_view_matrix");
+		auto uniform_location = glGetUniformLocation(uiShaderProgramID, "v3LightDirection");
+		glUniform3fv(uniform_location, 1, glm::value_ptr(m_Light.v3Direction));
+
+		uniform_location = glGetUniformLocation(uiShaderProgramID, "m4ProjectionView");
 		glUniformMatrix4fv(uniform_location, 1, false, glm::value_ptr(pCamera->GetProjectionView()));
 
-		uniform_location = glGetUniformLocation(uiShaderProgramID, "model_matrix");
+		uniform_location = glGetUniformLocation(uiShaderProgramID, "m4Model");
 		glUniformMatrix4fv(uniform_location, 1, false, glm::value_ptr(m4Model));
 
-		uniform_location = glGetUniformLocation(uiShaderProgramID, "color");
-		glUniform4fv(uniform_location, 1, glm::value_ptr(color));
+		//uniform_location = glGetUniformLocation(uiShaderProgramID, "v4Colour");
+		//glUniform4fv(uniform_location, 1, glm::value_ptr(color));
 
-		//uniform_location = glGetUniformLocation(uiShaderProgramID, "fragTime");
+		uniform_location = glGetUniformLocation(uiShaderProgramID, "m3Normal");
+		glUniformMatrix3fv(uniform_location, 1, false, glm::value_ptr(glm::inverseTranspose(glm::mat3(m4Model))));
+
+		//uniform_location = glGetUniformLocation(uiShaderProgramID, "fFragTime");
 		//glUniform1f(uniform_location, glfwGetTime());
 
 		//uniform_location = glGetUniformLocation(uiShaderProgramID, "time");
 		//glUniform1f(uniform_location, glfwGetTime());
-		pMesh->Draw();
+		//pMesh->Draw();
 
-		//myMesh->draw();
+		objMesh->draw();
 		//glBindVertexArray(VAO);
 		////glDrawArrays(GL_TRIANGLES, 0, number_of_verts);
 		//glDrawElements(GL_TRIANGLES, index_buffer_size, GL_UNSIGNED_INT, 0);
@@ -281,7 +296,7 @@ int main()
 
 	delete pCamera;
 	delete pMesh;
-	delete myMesh;
+	delete objMesh;
 
 	return 0;
 }

@@ -27,7 +27,7 @@ Mesh::~Mesh()
 	glDeleteBuffers(1, &m_uiVAO);
 	glDeleteBuffers(1, &m_uiVBO);
 	glDeleteBuffers(1, &m_uiIBO);
-	glDeleteTextures(1, &m_uiTexture);
+	//glDeleteTextures(1, &m_uiTexture);
 }
 
 void Mesh::InitialiseQuad()
@@ -48,10 +48,10 @@ void Mesh::InitialiseQuad()
 
 	Vertex vertices[4] =
 	{
-		Vertex{{-0.25f,	 0.25f, 0.25},	{0, 0}},
-		Vertex{{-0.25f,	-0.25f, 0.25},	{0, 1}},
-		Vertex{{ 0.25f,	 0.25f, 0.25},	{1, 0}},
-		Vertex{{ 0.25f,	-0.25f, 0.25},	{1, 1}}
+		Vertex{{-0.25f,	 0.25f, 0.25, 1.0f}, {0.0f, 1.0f, 0.0f, 0.0f}, {0, 0}},
+		Vertex{{-0.25f,	0.25f, -0.25, 1.0f}, {0.0f, 1.0f, 0.0f, 0.0f}, {0, 1}},
+		Vertex{{ 0.25f,	 0.25f, 0.25, 1.0f}, {0.0f, 1.0f, 0.0f, 0.0f}, {1, 0}},
+		Vertex{{ 0.25f,	0.25f, -0.25, 1.0f}, {0.0f, 1.0f, 0.0f, 0.0f}, {1, 1}}
 	};
 	////Front Verts
 	//vertices[0].v3Position = glm::vec3(-0.25f, 0.25f, 0.25);
@@ -96,46 +96,47 @@ void Mesh::InitialiseQuad()
 		//4,0,6,
 		//6,0,2
 	};
-	 
+	
 
-	 glBindVertexArray(m_uiVAO);
+	glBindVertexArray(m_uiVAO);
 
-	 glBindBuffer(GL_ARRAY_BUFFER, m_uiVBO);
-	 glBufferData(GL_ARRAY_BUFFER, 4 * sizeof(Vertex), vertices, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, m_uiVBO);
+	glBufferData(GL_ARRAY_BUFFER, 4 * sizeof(Vertex), vertices, GL_STATIC_DRAW);
 
-	 glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_uiIBO);
-	 glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_auiIndex.size() * sizeof(int), m_auiIndex.data(), GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_uiIBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_auiIndex.size() * sizeof(int), m_auiIndex.data(), GL_STATIC_DRAW);
 
-	 glEnableVertexAttribArray(0);
-	 glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
 
-	 glEnableVertexAttribArray(1);
-	 glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(glm::vec3)));
+	//glEnableVertexAttribArray(1);
+	//glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(glm::vec4) * 2));
 
-	 glBindVertexArray(0);
-	 glBindBuffer(GL_ARRAY_BUFFER, 0);
-	 glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_TRUE, sizeof(Vertex), (void*)16);
 
-	 glGenTextures(1, &m_uiTexture);
-	 glBindTexture(GL_TEXTURE_2D, m_uiTexture);
-	 glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, x, y, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 
-	 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
-	 glBindTexture(GL_TEXTURE_2D, 0);
-
-	 stbi_image_free(data);
+	//glGenTextures(1, &m_uiTexture);
+	//glBindTexture(GL_TEXTURE_2D, m_uiTexture);
+	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, x, y, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+	//
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	//
+	//glBindTexture(GL_TEXTURE_2D, 0);
+	//
+	//stbi_image_free(data);
 }
 
 void Mesh::Draw()
 {
-	glBindTexture(GL_TEXTURE_2D, m_uiTexture);
+	//glBindTexture(GL_TEXTURE_2D, m_uiTexture);
 	glBindVertexArray(m_uiVAO);
 	//glDrawArrays(GL_TRIANGLES, 0, number_of_verts);
 	glDrawElements(GL_TRIANGLES, m_auiIndex.size(), GL_UNSIGNED_INT, 0);
-
-
 }

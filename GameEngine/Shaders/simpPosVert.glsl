@@ -1,16 +1,16 @@
 #version 450
 
-layout (location = 0) in vec3 local_position;
-//layout (location = 1) in vec4 normal;
+layout (location = 0) in vec4 v4LocalPosition;
+layout (location = 1) in vec4 v4Normal;
 
-uniform mat4 projection_view_matrix;
-uniform mat4 model_matrix;
+uniform mat4 m4ProjectionView;
+uniform mat4 m4Model;
 
-out vec3 pos;
+out vec4 v4Position;
 
 void main()
 {
-	gl_Position = (projection_view_matrix * model_matrix) * vec4(local_position, 1);
+	gl_Position = (m4ProjectionView * m4Model) * v4LocalPosition;
 	
-	pos = local_position;
+	v4Position = v4LocalPosition;
 }

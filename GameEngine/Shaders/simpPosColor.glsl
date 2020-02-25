@@ -1,13 +1,13 @@
 #version 450
 
-uniform vec4 color = vec4(1,1,1,1);
-uniform float fragTime; 
+uniform vec4 v4Colour = vec4(1,1,1,1);
+uniform float fFragTime; 
 
-in vec3 pos;
+in vec4 v4Position;
 
-out vec4 final_color;
+out vec4 v4FinalColour;
 
 void main()
 {
-	final_color = vec4(pos,1);
+	v4FinalColour = v4Position;
 }

@@ -1,12 +1,12 @@
 #version 450
 
-uniform vec4 color = vec4(1,1,1,1);
+uniform vec4 v4Colour = vec4(1,1,1,1);
 
-in vec3 outNormal;
+in vec3 v3OutNormal;
 
-out vec4 final_color;
+out vec4 v4FinalColour;
 
 void main()
 {
-	final_color = vec4(outNormal,1) * 0.1;
+	v4FinalColour = vec4(v3OutNormal,1) * 0.1;
 }
