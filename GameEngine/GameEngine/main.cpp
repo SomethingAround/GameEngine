@@ -242,7 +242,7 @@ int main()
 		glUseProgram(uiShaderProgramID);
 
 		auto uniform_location = glGetUniformLocation(uiShaderProgramID, "v3LightDirection");
-		glUniform3fv(uniform_location, 1, glm::value_ptr(m_Light.v3Direction));
+		glUniform3fv(uniform_location, 1, glm::value_ptr(m_Light[0].v3Direction));
 
 		uniform_location = glGetUniformLocation(uiShaderProgramID, "m4ProjectionView");
 		glUniformMatrix4fv(uniform_location, 1, false, glm::value_ptr(pCamera->GetProjectionView()));
