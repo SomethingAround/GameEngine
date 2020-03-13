@@ -15,8 +15,10 @@ public:
 		const float nearDistance = 0.01f,
 		const float FarDistance = 100.0f);
 
+	//Updates the fly cameras position
 	void Update(float fDeltaTime) override;
 
+	//Sets the speed of the camera
 	void SetSpeed(float fSpeed);
 
 private:
@@ -25,6 +27,6 @@ private:
 
 	float m_fMouseSpeed;
 
-	glm::vec3 up;
+	glm::vec3 m_v3Up;
 };
 

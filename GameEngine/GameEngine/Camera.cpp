@@ -11,6 +11,7 @@ Camera::Camera()
 	projectionViewTransform = glm::mat4(1);
 }
 
+//Sets the camera to perspective and then updates the projection view matrix
 void Camera::SetPerspective(float fFieldOfView, float fAspectRatio, float fNear, float fFar)
 {
 	projectionTransform = glm::perspective(fFieldOfView, fAspectRatio, fNear, fFar);
@@ -18,6 +19,7 @@ void Camera::SetPerspective(float fFieldOfView, float fAspectRatio, float fNear,
 	UpdateProjectionViewTransform();
 }
 
+//Sets where the camera is looking at and from and then updates the projection view matrix
 void  Camera::SetLookAt(glm::vec3 from, glm::vec3 to, glm::vec3 up)
 {
 	viewTransform = glm::lookAt(from, to, up);
@@ -25,6 +27,7 @@ void  Camera::SetLookAt(glm::vec3 from, glm::vec3 to, glm::vec3 up)
 	UpdateProjectionViewTransform();
 }
 
+//Sets the position of the camera in the world space and updates the projection view matrix
 void Camera::SetPosition(glm::vec3 position)
 {
 	worldTransform[3] = glm::vec4(position, 1);

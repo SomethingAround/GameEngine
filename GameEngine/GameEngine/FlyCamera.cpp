@@ -9,11 +9,11 @@ FlyCamera::FlyCamera(
 	const float nearDistance,
 	const float FarDistance) : Camera::Camera()
 {
-	up = glm::vec3(0, 1, 0);
+	m_v3Up = glm::vec3(0, 1, 0);
 	m_fSpeed = 5.0f;
 	m_fMouseSpeed = 0.1f;
 	SetPerspective(FOVY, fAspectRatio, nearDistance, FarDistance);
-	SetLookAt(position, LookAtPoint, up);
+	SetLookAt(position, LookAtPoint, m_v3Up);
 }
 
 void FlyCamera::Update(float fDeltaTime)
@@ -24,36 +24,37 @@ void FlyCamera::Update(float fDeltaTime)
 
 	glm::vec3 displacement = glm::vec3(0);
 
+	//Checks if the W key is down
 	if (glfwGetKey(glfwWindow, GLFW_KEY_W))
 	{
 		displacement -= glm::vec3(worldTransform[2]);
 		inputFlag = true;
 	}
-
+	//Checks if the S key is down
 	if (glfwGetKey(glfwWindow, GLFW_KEY_S))
 	{
 		displacement += glm::vec3(worldTransform[2]);
 		inputFlag = true;
 	}
-
+	//Checks if the A key is down
 	if (glfwGetKey(glfwWindow, GLFW_KEY_A))
 	{
 		displacement -= glm::vec3(worldTransform[0]);
 		inputFlag = true;
 	}
-
+	//Checks if the D key is down
 	if (glfwGetKey(glfwWindow, GLFW_KEY_D))
 	{
 		displacement += glm::vec3(worldTransform[0]);
 		inputFlag = true;
 	}
-
+	//Checks if the LCTRL key is down
 	if (glfwGetKey(glfwWindow, GLFW_KEY_LEFT_CONTROL))
 	{
 		displacement -= glm::vec3(worldTransform[1]);
 		inputFlag = true;
 	}
-
+	//Checks if the Space key is down
 	if (glfwGetKey(glfwWindow, GLFW_KEY_SPACE))
 	{
 		displacement += glm::vec3(worldTransform[1]);
@@ -67,13 +68,16 @@ void FlyCamera::Update(float fDeltaTime)
 
 	double dCursorPositionX;
 	double dCursorPositionY;
-
+	
+	//Gets the cursor position
 	glfwGetCursorPos(glfwWindow, &dCursorPositionX, &dCursorPositionY);
 
 	double dDeltaX = dCursorPositionX - (1280 * 0.5);
 	double dDeltaY = dCursorPositionY - (720 * 0.5);
 
+	//Sets the cursor pos to the middle of the screen
 	glfwSetCursorPos(glfwWindow, 1280 * 0.5, 720 * 0.5);
+
 
 	if (dDeltaX || dDeltaY)
 	{

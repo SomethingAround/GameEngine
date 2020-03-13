@@ -5,9 +5,13 @@
 #include "gl_core_4_5.h"
 #include "glfw3.h"
 #include "FlyCamera.h"
+#include "Light.h"
 
 #include "Mesh.h"
 #include "OBJMesh.h"
+
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 
 #include <iostream>
 #include <fstream>
@@ -28,7 +32,7 @@ int main()
 	int iWindowHeight = 720;
 
 	GLFWwindow* pWindow = glfwCreateWindow(1280, 720, "Computer Graphics", nullptr, nullptr);
-
+	//Ends the program if the window is not created
 	if (pWindow == nullptr)
 	{
 		glfwTerminate();
@@ -53,19 +57,86 @@ int main()
 	//Camera
 	FlyCamera* pCamera = new FlyCamera(glm::vec3(0, 0, 1), glm::vec3(0), 1.507f, 16.0f / 9.0f, 0.1f, 50.0f);
 	glm::mat4 m4Model = glm::mat4(1.0f);
-	Mesh* pMesh = new Mesh;
+	//Mesh* pMesh = new Mesh;
 	OBJMesh* objMesh = new OBJMesh;
 
-	objMesh->load("..\\Models\\Bunny.obj", false);
+	objMesh->load("..\\Models\\meshSwordShield.obj", false);
+
+	int x, y, n;
+	unsigned char* texturePath;
+
+	unsigned int m_uiShieldTextureID = 0;
+	unsigned int m_uiShieldNormalID = 0;
+	unsigned int m_uiSwordTextureID = 0;
+	unsigned int m_uiSwordNormalID = 0;
+
+	//Load Shield texture
+	glGenTextures(1, &m_uiShieldTextureID);
+	glBindTexture(GL_TEXTURE_2D, m_uiShieldTextureID);
+	stbi_set_flip_vertically_on_load(true);
+
+	//Gets location of the shield albedo map
+	texturePath = stbi_load("../Textures/UVAlbedoMap_Shield.png", &x, &y, &n, 0);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, x, y, 0, GL_RGB, GL_UNSIGNED_BYTE, texturePath);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+	stbi_image_free(texturePath);
+
+	//Load Shield normal map
+	glGenTextures(1, &m_uiShieldNormalID);
+	glBindTexture(GL_TEXTURE_2D, m_uiShieldNormalID);
+	stbi_set_flip_vertically_on_load(true);
+
+	//Gets location of the shield normal map
+	texturePath = stbi_load("../Textures/UVNormalMap_Shield.png", &x, &y, &n, 0);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, x, y, 0, GL_RGB, GL_UNSIGNED_BYTE, texturePath);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+	stbi_image_free(texturePath);
+
+	//Load Sword texture
+	glGenTextures(1, &m_uiSwordTextureID);
+	glBindTexture(GL_TEXTURE_2D, m_uiSwordTextureID);
+	stbi_set_flip_vertically_on_load(true);
+
+	//Gets location of the sword albedo map
+	texturePath = stbi_load("../Textures/UVAlbedoMap_Sword.png", &x, &y, &n, 0);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, x, y, 0, GL_RGB, GL_UNSIGNED_BYTE, texturePath);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+	stbi_image_free(texturePath);
+
+	//Load Sword normal map
+	glGenTextures(1, &m_uiSwordNormalID);
+	glBindTexture(GL_TEXTURE_2D, m_uiSwordNormalID);
+	stbi_set_flip_vertically_on_load(true);
+
+	//Gets location of the sword normal map
+	texturePath = stbi_load("../Textures/UVNormalMap_Sword.png", &x, &y, &n, 0);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, x, y, 0, GL_RGB, GL_UNSIGNED_BYTE, texturePath);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+	stbi_image_free(texturePath);
 
 	unsigned int uiVertexShaderID = 0;
 	unsigned int uiFragementShaderID = 0;
 	unsigned int uiShaderProgramID = 0;
 
 	std::string sShaderData;
+
+	//Gets the location of the vertex shader
 	std::ifstream inFileStream("..\\Shaders\\PhongLightVert.glsl", std::ifstream::in);
 
 	std::stringstream stringStream;
+
 	//Load the source into a string for compilation
 	if (inFileStream.is_open())
 	{
@@ -73,6 +144,7 @@ int main()
 		sShaderData = stringStream.str();
 		inFileStream.close();
 	}
+
 	//Allocate space for shader program
 	uiVertexShaderID = glCreateShader(GL_VERTEX_SHADER);
 
@@ -89,6 +161,7 @@ int main()
 	GLint success = GL_FALSE;
 	glGetShaderiv(uiVertexShaderID, GL_COMPILE_STATUS, &success);
 
+	//Checks if the vertex shader has loaded successfully
 	if (success == GL_FALSE)
 	{
 		//Get the length of IoenGL error message
@@ -112,10 +185,11 @@ int main()
 
 
 
-
-	std::ifstream frag_in_file_stream("..\\Shaders\\PhongLightFrag.glsl", std::ifstream::in);
+	//Gets the location of the fragment shader
+	std::ifstream frag_in_file_stream("..\\Shaders\\PhongLightFrag2.glsl", std::ifstream::in);
 
 	std::stringstream fragment_string_stream;
+
 	//Load the source into a string for compilation
 	if (frag_in_file_stream.is_open())
 	{
@@ -123,6 +197,7 @@ int main()
 		sShaderData = fragment_string_stream.str();
 		frag_in_file_stream.close();
 	}
+
 	//Allocate space for shader program
 	uiFragementShaderID = glCreateShader(GL_FRAGMENT_SHADER);
 
@@ -139,6 +214,7 @@ int main()
 	success = GL_FALSE;
 	glGetShaderiv(uiFragementShaderID, GL_COMPILE_STATUS, &success);
 
+	//Checks if the fragment shader has loaded successfully
 	if (success == GL_FALSE)
 	{
 		//Get the length of IoenGL error message
@@ -162,7 +238,7 @@ int main()
 
 
 
-
+	//Creates the shader
 	uiShaderProgramID = glCreateProgram();
 	glAttachShader(uiShaderProgramID, uiVertexShaderID);
 	glAttachShader(uiShaderProgramID, uiFragementShaderID);
@@ -172,6 +248,8 @@ int main()
 
 	success = GL_FALSE;
 	glGetProgramiv(uiShaderProgramID, GL_LINK_STATUS, &success);
+
+	//Checks if the shader has loaded successfully
 	if (success == GL_FALSE)
 	{
 		//Get the length of IoenGL error message
@@ -191,58 +269,85 @@ int main()
 
 		//Clean up anyway
 		delete[] log;
-		//printf("Shader Linking Failed");
 	}
-
-	float fLineWidth = 1.0f;
-	bool bHit = false;
-
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	//glLineWidth(fLineWidth);
-	
-	//glClearColor(0.50f, 0.50f, 0.50f, 1);
 
 	float fCurrentFrame = glfwGetTime();
 	float fDeltaTime = 0.0f;
 	float fLastFrame = 0.0f;
 
+	//Set cursor to the middle of the screen and hide it
 	glfwSetCursorPos(pWindow, iWindowWidth * 0.5, iWindowHeight * 0.5);
 	ShowCursor(false);
 
-	struct Light
-	{
-		glm::vec3 v3Direction;
-	};
+	//Creates light
+	const int nLightCount = 2;
+	Light light[nLightCount];
 
-	Light m_Light[2];
-	m_Light[1].v3Direction = glm::normalize(glm::vec3(glm::cos(0.0f), glm::sin(-1.0f), 0));
+	//Sets lights specualr and diffuse
+	light[0].m_v3Specular = {1, 1, 1};
+	light[0].m_v3Diffuse = {0.0f, 0.75f, 0.75f};
+
+	light[1].m_v3Specular = { 1, 1, 1 };
+	light[1].m_v3Diffuse = { 0.75f, 0.0f, 0.0f };
+
+	glm::vec3 v3AmbientLight = {0.1f,0.1f,0.1f};
+
 	//Game Loop
 	while (glfwWindowShouldClose(pWindow) == false && glfwGetKey(pWindow, GLFW_KEY_ESCAPE) != GLFW_PRESS)
 	{
-		glClearColor(0.5f, 0.5f, 0.5f, 1);
 		glEnable(GL_DEPTH_TEST);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		glPointSize(fLineWidth);
-
+		//Calculate deltatime
 		fCurrentFrame = glfwGetTime();
 		fDeltaTime = fCurrentFrame - fLastFrame;
 		fLastFrame = fCurrentFrame;
 
 		pCamera->Update(fDeltaTime);
 
-		m_Light[0].v3Direction = glm::normalize(glm::vec3(glm::cos(fCurrentFrame), glm::sin(fCurrentFrame), 0));
-
-		//model = glm::rotate(model, 0.016f, glm::vec3(0.5f));
-
-		//glm::mat4 pv = projection * view;
+		//Sets light direction 
+		light[0].m_v3Direction = glm::normalize(glm::vec3(-1, 0, 0));
+		light[1].m_v3Direction = glm::normalize(glm::vec3(0, -1, 0));
 
 		glm::vec4 color = glm::vec4(0.5f);
-	
+
 		glUseProgram(uiShaderProgramID);
 
-		auto uniform_location = glGetUniformLocation(uiShaderProgramID, "v3LightDirection");
-		glUniform3fv(uniform_location, 1, glm::value_ptr(m_Light[0].v3Direction));
+		auto uniform_location = glGetUniformLocation(uiShaderProgramID, "light[0].Ia");
+		glUniform3fv(uniform_location, 1, glm::value_ptr(v3AmbientLight));
+
+		uniform_location = glGetUniformLocation(uiShaderProgramID, "light[0].Id");
+		glUniform3fv(uniform_location, 1, glm::value_ptr(light[0].m_v3Diffuse));
+
+		uniform_location = glGetUniformLocation(uiShaderProgramID, "light[0].Is");
+		glUniform3fv(uniform_location, 1, glm::value_ptr(light[0].m_v3Specular));
+
+		uniform_location = glGetUniformLocation(uiShaderProgramID, "light[1].Ia");
+		glUniform3fv(uniform_location, 1, glm::value_ptr(v3AmbientLight));
+
+		uniform_location = glGetUniformLocation(uiShaderProgramID, "light[1].Id");
+		glUniform3fv(uniform_location, 1, glm::value_ptr(light[1].m_v3Diffuse));
+
+		uniform_location = glGetUniformLocation(uiShaderProgramID, "light[1].Is");
+		glUniform3fv(uniform_location, 1, glm::value_ptr(light[1].m_v3Specular));
+
+		uniform_location = glGetUniformLocation(uiShaderProgramID, "Ka");
+		glUniform3fv(uniform_location, 1, glm::value_ptr(glm::vec3(1)));
+
+		uniform_location = glGetUniformLocation(uiShaderProgramID, "Kd");
+		glUniform3fv(uniform_location, 1, glm::value_ptr(glm::vec3(1)));
+
+		uniform_location = glGetUniformLocation(uiShaderProgramID, "Ks");
+		glUniform3fv(uniform_location, 1, glm::value_ptr(glm::vec3(1)));
+
+		uniform_location = glGetUniformLocation(uiShaderProgramID, "v3CameraPosition");
+		glUniform3fv(uniform_location, 1, glm::value_ptr(glm::vec3(glm::inverse(pCamera->GetView())[3])));
+
+		uniform_location = glGetUniformLocation(uiShaderProgramID, "light[0].v3LightDirection");
+		glUniform3fv(uniform_location, 1, glm::value_ptr(light[0].m_v3Direction));
+
+		uniform_location = glGetUniformLocation(uiShaderProgramID, "light[1].v3LightDirection");
+		glUniform3fv(uniform_location, 1, glm::value_ptr(light[1].m_v3Direction));
 
 		uniform_location = glGetUniformLocation(uiShaderProgramID, "m4ProjectionView");
 		glUniformMatrix4fv(uniform_location, 1, false, glm::value_ptr(pCamera->GetProjectionView()));
@@ -250,42 +355,45 @@ int main()
 		uniform_location = glGetUniformLocation(uiShaderProgramID, "m4Model");
 		glUniformMatrix4fv(uniform_location, 1, false, glm::value_ptr(m4Model));
 
-		//uniform_location = glGetUniformLocation(uiShaderProgramID, "v4Colour");
-		//glUniform4fv(uniform_location, 1, glm::value_ptr(color));
+		uniform_location = glGetUniformLocation(uiShaderProgramID, "lightCount");
+		glUniform1i(uniform_location, nLightCount);
 
 		uniform_location = glGetUniformLocation(uiShaderProgramID, "m3Normal");
 		glUniformMatrix3fv(uniform_location, 1, false, glm::value_ptr(glm::inverseTranspose(glm::mat3(m4Model))));
 
-		//uniform_location = glGetUniformLocation(uiShaderProgramID, "fFragTime");
-		//glUniform1f(uniform_location, glfwGetTime());
+		uniform_location = glGetUniformLocation(uiShaderProgramID, "fSpecularPower");
+		glUniform1f(uniform_location, 32);
 
-		//uniform_location = glGetUniformLocation(uiShaderProgramID, "time");
-		//glUniform1f(uniform_location, glfwGetTime());
-		//pMesh->Draw();
+		//Passes texture to shield mesh
+		uniform_location = glGetUniformLocation(uiShaderProgramID, "diffuseTexture");
+		glUniform1i(uniform_location, 0);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, m_uiShieldTextureID);
 
-		objMesh->draw();
-		//glBindVertexArray(VAO);
-		////glDrawArrays(GL_TRIANGLES, 0, number_of_verts);
-		//glDrawElements(GL_TRIANGLES, index_buffer_size, GL_UNSIGNED_INT, 0);
+		uniform_location = glGetUniformLocation(uiShaderProgramID, "normalTexture");
+		glUniform1i(uniform_location, 1);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, m_uiShieldNormalID);
+
+		//Draws shield with texture
+		glBindVertexArray(objMesh->m_meshChunks[0].vao);
+		glDrawElements(GL_TRIANGLES, objMesh->m_meshChunks[0].indexCount, GL_UNSIGNED_INT, 0);
 
 
-		if (fLineWidth >= 10.0f && !bHit)
-		{
-			bHit = true;
-		}
-		else if(fLineWidth <= 0.0f && bHit)
-		{
-			bHit = false;
-		}
+		//Passes texture to sword mesh
+		uniform_location = glGetUniformLocation(uiShaderProgramID, "diffuseTexture");
+		glUniform1i(uniform_location, 0);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, m_uiSwordTextureID);
 
-		if (bHit == true)
-		{
-			fLineWidth -= 0.75f;
-		}
-		else
-		{
-			fLineWidth += 0.75f;
-		}
+		uniform_location = glGetUniformLocation(uiShaderProgramID, "normalTexture");
+		glUniform1i(uniform_location, 1);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, m_uiSwordNormalID);
+
+		//Draws sword texture
+		glBindVertexArray(objMesh->m_meshChunks[1].vao);
+		glDrawElements(GL_TRIANGLES, objMesh->m_meshChunks[1].indexCount, GL_UNSIGNED_INT, 0);
 
 		glfwSwapBuffers(pWindow);
 		glfwPollEvents();
@@ -294,9 +402,12 @@ int main()
 	glfwDestroyWindow(pWindow);
 	glfwTerminate();
 
+	//Delete pointers
 	delete pCamera;
-	delete pMesh;
+	pCamera = nullptr;
+
 	delete objMesh;
+	objMesh = nullptr;
 
 	return 0;
 }

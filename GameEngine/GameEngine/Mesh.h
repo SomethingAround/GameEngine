@@ -17,9 +17,9 @@ public:
 		glm::vec2 v2UV;
 	};
 
-	//std::vector<glm::vec3> m_av3Vericies;
 	std::vector<unsigned int> m_auiIndex;
 
+	//Creates a quad
 	void InitialiseQuad();
 
 	virtual void Draw();
