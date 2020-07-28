@@ -36,5 +36,4 @@ private:
 	unsigned char* data;
 	unsigned int athing;
 	unsigned int athing2;
-	unsigned int athing3;
 };
