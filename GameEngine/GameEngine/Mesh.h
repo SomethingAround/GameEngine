@@ -39,4 +39,5 @@ private:
 	unsigned int athing9;
 	unsigned int athing8;
 	unsigned int athing7;
+	unsigned int athing6;
 };
