@@ -34,4 +34,5 @@ private:
 	int x, y, n;
 	
 	unsigned char* data;
+	unsigned int athing;
 };
